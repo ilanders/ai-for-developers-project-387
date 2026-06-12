@@ -98,4 +98,65 @@ class AdminRoutesTest {
         val list = body<List<Booking>>(response)
         assertTrue(list.isEmpty())
     }
+
+    @Test
+    fun `GET availability returns default config`() = testApplication {
+        application { testModule() }
+        val response = client.get("/api/admin/availability")
+        assertEquals(HttpStatusCode.OK, response.status)
+        val config = body<AvailabilityConfig>(response)
+        assertFalse(config.weekly.isEmpty())
+        assertEquals(5, config.weekly.size)
+        assertTrue(config.overrides.isEmpty())
+    }
+
+    @Test
+    fun `PUT availability updates and returns new config`() = testApplication {
+        application { testModule() }
+        val newConfig = AvailabilityConfig(
+            weekly = listOf(
+                WeeklyAvailability(
+                    dayOfWeek = DayOfWeek.monday,
+                    windows = listOf(TimeRange("09:00", "13:00"))
+                )
+            ),
+            overrides = listOf(
+                DateOverride(date = "2026-12-25", windows = null)
+            )
+        )
+        val response = client.put("/api/admin/availability") {
+            contentType(ContentType.Application.Json)
+            setBody(testJson.encodeToString(newConfig))
+        }
+        assertEquals(HttpStatusCode.OK, response.status)
+        val config = body<AvailabilityConfig>(response)
+        assertEquals(1, config.weekly.size)
+        assertEquals(DayOfWeek.monday, config.weekly[0].dayOfWeek)
+        assertEquals(1, config.weekly[0].windows.size)
+        assertEquals("09:00", config.weekly[0].windows[0].start)
+        assertEquals(1, config.overrides.size)
+        assertEquals("2026-12-25", config.overrides[0].date)
+        assertNull(config.overrides[0].windows)
+    }
+
+    @Test
+    fun `GET availability returns updated config after PUT`() = testApplication {
+        application { testModule() }
+        val newConfig = AvailabilityConfig(
+            weekly = emptyList(),
+            overrides = listOf(
+                DateOverride(date = "2026-07-04", windows = listOf(TimeRange("10:00", "14:00")))
+            )
+        )
+        client.put("/api/admin/availability") {
+            contentType(ContentType.Application.Json)
+            setBody(testJson.encodeToString(newConfig))
+        }
+        val response = client.get("/api/admin/availability")
+        assertEquals(HttpStatusCode.OK, response.status)
+        val config = body<AvailabilityConfig>(response)
+        assertTrue(config.weekly.isEmpty())
+        assertEquals(1, config.overrides.size)
+        assertEquals("2026-07-04", config.overrides[0].date)
+    }
 }

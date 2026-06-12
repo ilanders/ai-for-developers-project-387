@@ -11,6 +11,18 @@ class InMemoryStore {
     val eventTypes = mutableMapOf<String, EventType>()
     val bookings = mutableListOf<Booking>()
 
+    @Volatile
+    var availabilityConfig: AvailabilityConfig = AvailabilityConfig(
+        weekly = listOf(
+            WeeklyAvailability(dayOfWeek = DayOfWeek.monday, windows = listOf(TimeRange("09:00", "17:00"))),
+            WeeklyAvailability(dayOfWeek = DayOfWeek.tuesday, windows = listOf(TimeRange("09:00", "17:00"))),
+            WeeklyAvailability(dayOfWeek = DayOfWeek.wednesday, windows = listOf(TimeRange("09:00", "17:00"))),
+            WeeklyAvailability(dayOfWeek = DayOfWeek.thursday, windows = listOf(TimeRange("09:00", "17:00"))),
+            WeeklyAvailability(dayOfWeek = DayOfWeek.friday, windows = listOf(TimeRange("09:00", "17:00"))),
+        ),
+        overrides = emptyList()
+    )
+
     fun addEventType(eventType: EventType): EventType {
         synchronized(eventTypes) {
             if (eventTypes.containsKey(eventType.id)) {

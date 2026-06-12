@@ -35,5 +35,15 @@ fun Route.adminRoutes(
             val bookings = bookingService.listBookings()
             call.respond(bookings)
         }
+
+        get("/availability") {
+            call.respond(store.availabilityConfig)
+        }
+
+        put("/availability") {
+            val config = call.receive<AvailabilityConfig>()
+            store.availabilityConfig = config
+            call.respond(config)
+        }
     }
 }

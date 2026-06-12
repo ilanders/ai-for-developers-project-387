@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+    "/api/admin/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["Admin_getAvailability"];
+        put: operations["Admin_updateAvailability"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/bookings": {
         parameters: {
             query?: never;
@@ -104,6 +120,10 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AvailabilityConfig: {
+            weekly: components["schemas"]["WeeklyAvailability"][];
+            overrides: components["schemas"]["DateOverride"][];
+        };
         Booking: {
             id: string;
             eventTypeId: string;
@@ -134,6 +154,12 @@ export interface components {
             /** Format: int32 */
             durationMinutes: number;
         };
+        DateOverride: {
+            date: string;
+            windows?: components["schemas"]["TimeRange"][];
+        };
+        /** @enum {string} */
+        DayOfWeek: "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
         EventType: {
             id: string;
             title: string;
@@ -162,11 +188,19 @@ export interface components {
             /** Format: date-time */
             endTime: string;
         };
+        TimeRange: {
+            start: string;
+            end: string;
+        };
         ValidationError: {
             /** @enum {string} */
             code: "VALIDATION_ERROR";
             message: string;
             details?: string;
+        };
+        WeeklyAvailability: {
+            dayOfWeek: components["schemas"]["DayOfWeek"];
+            windows: components["schemas"]["TimeRange"][];
         };
     };
     responses: never;
@@ -177,6 +211,59 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    Admin_getAvailability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AvailabilityConfig"];
+                };
+            };
+        };
+    };
+    Admin_updateAvailability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AvailabilityConfig"];
+            };
+        };
+        responses: {
+            /** @description The request has succeeded. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AvailabilityConfig"];
+                };
+            };
+            /** @description Client error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationError"];
+                };
+            };
+        };
+    };
     Admin_listBookings: {
         parameters: {
             query?: never;
