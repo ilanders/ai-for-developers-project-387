@@ -58,6 +58,38 @@ model CreateBookingRequest {
   guest: GuestContact;
 }
 
+// ===== Availability Models =====
+
+model TimeRange {
+  start: string;
+  end: string;
+}
+
+enum DayOfWeek {
+  monday,
+  tuesday,
+  wednesday,
+  thursday,
+  friday,
+  saturday,
+  sunday,
+}
+
+model WeeklyAvailability {
+  dayOfWeek: DayOfWeek;
+  windows: TimeRange[];
+}
+
+model DateOverride {
+  date: string;
+  windows?: TimeRange[];
+}
+
+model AvailabilityConfig {
+  weekly: WeeklyAvailability[];
+  overrides: DateOverride[];
+}
+
 // ===== Error Models =====
 
 @error
@@ -103,6 +135,14 @@ interface Admin {
   @get
   @route("/bookings")
   listBookings(): Booking[];
+
+  @get
+  @route("/availability")
+  getAvailability(): AvailabilityConfig;
+
+  @put
+  @route("/availability")
+  updateAvailability(@body body: AvailabilityConfig): AvailabilityConfig | ValidationError;
 }
 
 // ===== Public API =====

@@ -9,6 +9,11 @@ export type CreateBookingRequest = components['schemas']['CreateBookingRequest']
 export type NotFoundError = components['schemas']['NotFoundError']
 export type ConflictError = components['schemas']['ConflictError']
 export type ValidationError = components['schemas']['ValidationError']
+export type AvailabilityConfig = components['schemas']['AvailabilityConfig']
+export type WeeklyAvailability = components['schemas']['WeeklyAvailability']
+export type DateOverride = components['schemas']['DateOverride']
+export type TimeRange = components['schemas']['TimeRange']
+export type DayOfWeek = components['schemas']['DayOfWeek']
 
 export type ApiErrorBody = NotFoundError | ConflictError | ValidationError
 
@@ -83,3 +88,16 @@ export function createBooking(
 }
 
 export type GuestContact = components['schemas']['GuestContact']
+
+export function getAvailability(): Promise<AvailabilityConfig> {
+  return request('/api/admin/availability')
+}
+
+export function updateAvailability(
+  body: AvailabilityConfig,
+): Promise<AvailabilityConfig> {
+  return request('/api/admin/availability', {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  })
+}

@@ -6,6 +6,7 @@ import BookingPage from './pages/BookingPage'
 import OwnerPage from './pages/admin/OwnerPage'
 import EventTypesPage from './pages/admin/EventTypesPage'
 import BookingsPage from './pages/admin/BookingsPage'
+import AvailabilityPage from './pages/admin/AvailabilityPage'
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
         <Route index element={<Navigate to="/admin/owner" replace />} />
         <Route path="owner" element={<OwnerPage />} />
         <Route path="event-types" element={<EventTypesPage />} />
+        <Route path="availability" element={<AvailabilityPage />} />
         <Route path="bookings" element={<BookingsPage />} />
       </Route>
     </Routes>
